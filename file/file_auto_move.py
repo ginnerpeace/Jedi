@@ -43,8 +43,8 @@ def execute(args = []):
         # 这里使用info函数之后, 所有print颜色都变了
         info('starting...')
 
-        strTime = str(time.time())
-        tarFileName = os.path.abspath('~/../') + '/file_moving_backup-' + strTime + '.tar.gz'
+        # 在当前用户的桌面目录下创建tgz文件用于备份
+        tarFileName = os.environ['HOME'] + '/Desktop/file_moving_backup-' + str(time.time()) + '.tar.gz'
         tar = tarfile.open(tarFileName, 'w:gz')
         backupCount = 0
 
