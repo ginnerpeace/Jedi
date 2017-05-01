@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import os, sys, re, shutil
+import os, sys, shutil, tarfile, time
 
 printColor = '\033[0;32m'
 
 def show_help():
     print('\033[1;33m')
     print('会不会用? 辣鸡')
+    print('-----------------')
+    print('python file_auto_move.py [filelist] [fromdir] [todir]')
     print('\033[1;32m')
     sys.exit(0)
 
@@ -38,7 +40,13 @@ def execute(args = []):
         if (len(items) < 1):
             error('no such content in file.')
 
+        # 这里使用info函数之后, 所有print颜色都变了
         info('starting...')
+
+        strTime = str(time.time())
+        tarFileName = os.path.abspath('~/../') + '/file_moving_backup-' + strTime + '.tar.gz'
+        tar = tarfile.open(tarFileName, 'w:gz')
+        backupCount = 0
 
         for item in items:
             if (len(item) < 1):
@@ -58,10 +66,20 @@ def execute(args = []):
             # 文件夹不存在时自动创建新文件夹: mkdir -p
             if (not os.path.isdir(targetDir)):
                 os.makedirs(targetDir)
+            elif (os.path.isfile(targetFile)):
+                # 备份目标文件
+                notice('backup: ' + targetFile + ' -> ' + tarFileName)
+                tar.add(targetFile)
+                backupCount += 1
 
-            info('moving: ' + sourceFile + ' >>> ' + targetFile)
+            print('moving: ' + sourceFile + ' >>> ' + targetFile)
             # 复制文件
             shutil.copy(sourceFile, targetDir);
+
+        tar.close()
+        if (0 == backupCount):
+            # 移除备份文件
+            os.remove(tarFileName)
 
     except Exception as e:
         print('\033[0;31mError!!!')
